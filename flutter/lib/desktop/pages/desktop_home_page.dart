@@ -96,24 +96,25 @@ class _DesktopHomePageState extends State<DesktopHomePage>
             ),
           ),
           const SizedBox(width: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E3D5C),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: () {
-                  final textToCopy = copyText.isNotEmpty ? copyText : value.replaceAll(' ', '');
-                  if (textToCopy.isNotEmpty) {
-                    Clipboard.setData(ClipboardData(text: textToCopy));
-                    showToast(translate("Copied"));
-                  }
-                },
-                child: const Padding(
-                  padding: EdgeInsets.all(10),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                final textToCopy = copyText.isNotEmpty ? copyText : value.replaceAll(' ', '');
+                if (textToCopy.isNotEmpty) {
+                  Clipboard.setData(ClipboardData(text: textToCopy));
+                  showToast(translate("Copied"));
+                }
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E3D5C),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
                   child: Icon(Icons.copy_rounded, size: 18, color: Color(0xFF4EC9E1)),
                 ),
               ),
