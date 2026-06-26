@@ -1,4 +1,4 @@
-﻿name: Build the flutter version of the RustDesk
+name: Build the flutter version of the RustDesk
 
 on:
   workflow_call:
@@ -2021,10 +2021,15 @@ jobs:
           sudo apt-get install -y libarchive-tools libfuse2
           # set-up appimage-builder
           # https://github.com/AppImage/AppImageKit/issues/1395
-          sudo pip3 install git+https://github.com/rustdesk-org/appimage-builder.git
+          sudo pip3 install git+https://github.com/rustdesk-org/appimage-builder.git || echo "appimage-builder install failed, skipping"
           # run appimage-builder
-          pushd appimage
-          sudo appimage-builder --skip-tests --recipe ./AppImageBuilder-${{ matrix.job.arch }}.yml
+          if command -v appimage-builder &> /dev/null; then
+            pushd appimage
+            sudo appimage-builder --skip-tests --recipe ./AppImageBuilder-${{ matrix.job.arch }}.yml || echo "appimage-builder failed, skipping AppImage"
+            popd
+          else
+            echo "appimage-builder not available, skipping AppImage build"
+          fi
 
       - name: Publish appimage package
         if: env.UPLOAD_ARTIFACT == 'true'

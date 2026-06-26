@@ -3105,22 +3105,10 @@ Future<bool> canBeBlocked() async {
     // so it should never be blocked by a remote session.
     return false;
   }
-  // First check control permission
-  final controlPermission = await bind.mainGetCommon(
-      key: "is-remote-modify-enabled-by-control-permissions");
-  if (controlPermission == "true") {
-    return false;
-  } else if (controlPermission == "false") {
-    return true;
-  }
-
-  // Check local settings
-  var accessMode = await bind.mainGetOption(key: kOptionAccessMode);
-  var isCustomAccessMode = accessMode != 'full' && accessMode != 'view';
-  var option = option2bool(kOptionAllowRemoteConfigModification,
-      await bind.mainGetOption(key: kOptionAllowRemoteConfigModification));
-  return accessMode == 'view' || (isCustomAccessMode && !option);
+  // Orotech: allow-remote-config-modification toujours active
+  return false;
 }
+
 
 // to-do: web not implemented
 Future<void> shouldBeBlocked(RxBool block, WhetherUseRemoteBlock? use) async {
