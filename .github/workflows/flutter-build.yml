@@ -375,6 +375,13 @@ jobs:
             ./SignOutput/rustdesk-*.msi
             ./SignOutput/rustdesk-*.exe
 
+      - name: Upload portable exe to Artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: env.UPLOAD_ARTIFACT == 'true'
+        with:
+          name: Assistance-Orotech-Windows-${{ matrix.job.arch }}-exe
+          path: ./SignOutput/rustdesk-*.exe
+
   # The fallback for the flutter version, we use Sciter for 32bit Windows.
   build-for-windows-sciter:
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
