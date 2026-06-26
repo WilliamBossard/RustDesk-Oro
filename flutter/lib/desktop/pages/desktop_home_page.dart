@@ -6,6 +6,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hbb/common.dart';
+import 'package:flutter_hbb/common/formatter/id_formatter.dart';
 import 'package:flutter_hbb/common/widgets/animated_rotation_widget.dart';
 import 'package:flutter_hbb/common/widgets/custom_password.dart';
 import 'package:flutter_hbb/consts.dart';
@@ -74,6 +75,51 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         block: _block, mask: true, use: canBeBlocked, child: child);
   }
 
+  Widget _buildOroCopyField({
+    required String value,
+    required String copyText,
+    required TextStyle style,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D1B2A),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF2A5070), width: 1.5),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: SelectableText(
+              value,
+              style: style,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Material(
+            color: const Color(0xFF1E3D5C),
+            borderRadius: BorderRadius.circular(8),
+            child: InkWell(
+              onTap: copyText.isEmpty
+                  ? null
+                  : () {
+                      Clipboard.setData(ClipboardData(text: copyText));
+                      showToast(translate("Copied"));
+                    },
+              borderRadius: BorderRadius.circular(8),
+              splashColor: const Color(0xFF4EC9E1).withOpacity(0.3),
+              child: const Padding(
+                padding: EdgeInsets.all(10),
+                child: Icon(Icons.copy_rounded,
+                    size: 18, color: Color(0xFF4EC9E1)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget buildLeftPane(BuildContext context) {
     final isIncomingOnly = true;
     final isOutgoingOnly = false;
@@ -98,12 +144,13 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                 key: _childKey,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo OROTECH (photo.png)
+                  // Logo OROTECH (photo.png, fond transparent)
                   Container(
                     constraints: const BoxConstraints(maxWidth: 200, maxHeight: 120),
                     child: Image.asset(
                       'assets/photo.png',
                       fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
                       errorBuilder: (ctx, e, st) => loadLogo(),
                     ),
                   ),
@@ -177,52 +224,16 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           // ID value
                           Consumer<ServerModel>(
                             builder: (context, model, child) {
-                              return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF0D1B2A),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: const Color(0xFF2A5070), width: 1.5),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: model.serverId,
-                                        readOnly: true,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.zero,
-                                        ),
-                                        style: const TextStyle(
-                                          fontSize: 36,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          letterSpacing: 4,
-                                        ),
-                                      ).workaroundFreezeLinuxMint(),
-                                    ),
-                                    Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: () {
-                                          Clipboard.setData(ClipboardData(text: model.serverId.text));
-                                          showToast(translate("Copied"));
-                                        },
-                                        borderRadius: BorderRadius.circular(8),
-                                        splashColor: const Color(0xFF4EC9E1).withOpacity(0.3),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFF1E3D5C),
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: const Icon(Icons.copy_rounded, size: 18, color: Color(0xFF4EC9E1)),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                              final idController =
+                                  model.serverId as IDTextEditingController;
+                              return _buildOroCopyField(
+                                value: idController.text,
+                                copyText: idController.id,
+                                style: const TextStyle(
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 4,
                                 ),
                               );
                             },
@@ -242,52 +253,14 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           // Password value
                           Consumer<ServerModel>(
                             builder: (context, model, child) {
-                              return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF0D1B2A),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: const Color(0xFF2A5070), width: 1.5),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: model.serverPasswd,
-                                        readOnly: true,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.zero,
-                                        ),
-                                        style: const TextStyle(
-                                          fontSize: 28,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.white,
-                                          letterSpacing: 3,
-                                        ),
-                                      ).workaroundFreezeLinuxMint(),
-                                    ),
-                                    Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: () {
-                                          Clipboard.setData(ClipboardData(text: model.serverPasswd.text));
-                                          showToast(translate("Copied"));
-                                        },
-                                        borderRadius: BorderRadius.circular(8),
-                                        splashColor: const Color(0xFF4EC9E1).withOpacity(0.3),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFF1E3D5C),
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: const Icon(Icons.copy_rounded, size: 18, color: Color(0xFF4EC9E1)),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                              return _buildOroCopyField(
+                                value: model.serverPasswd.text,
+                                copyText: model.serverPasswd.text,
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: 3,
                                 ),
                               );
                             },
@@ -295,6 +268,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           const SizedBox(height: 28),
                           // Online status
                           OnlineStatusWidget(
+                            textColor: const Color(0xFF8AB4C8),
                             onSvcStatusChanged: () {
                               if (isInHomePage()) {
                                 Future.delayed(const Duration(milliseconds: 300), () {
