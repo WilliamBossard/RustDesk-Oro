@@ -110,7 +110,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                   const SizedBox(height: 6),
                   // App name
                   const Text(
-                    "ASSISTANCE OROTECH",
+                    "ASSISTANCE ORO",
                     style: TextStyle(
                       fontSize: 12,
                       color: Color(0xFF4EC9E1),

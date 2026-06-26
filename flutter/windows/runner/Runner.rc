@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "Purslane Ltd" "\0"
-            VALUE "FileDescription", "Assistance orotech" "\0"
+            VALUE "FileDescription", "Assistance Oro" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "Assistance orotech" "\0"
+            VALUE "InternalName", "Assistance Oro" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024. All rights reserved." "\0"
-            VALUE "OriginalFilename", "Assistance orotech.exe" "\0"
-            VALUE "ProductName", "Assistance orotech" "\0"
+            VALUE "OriginalFilename", "Assistance Oro.exe" "\0"
+            VALUE "ProductName", "Assistance Oro" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
