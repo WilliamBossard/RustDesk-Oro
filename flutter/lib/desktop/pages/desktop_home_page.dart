@@ -84,9 +84,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFF8F4EC), Color(0xFFF0EAD6)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF0D1B2A), Color(0xFF1A3550)],
           ),
         ),
         child: Center(
@@ -98,32 +98,37 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                 key: _childKey,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo
+                  // Logo OROTECH (photo.png)
                   Container(
-                    constraints: const BoxConstraints(maxWidth: 320, maxHeight: 80),
-                    child: loadLogo(),
-                  ),
-                  const SizedBox(height: 8),
-                  // App name
-                  const Text(
-                    "Assistance orotech",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFFB8962E),
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.5,
+                    constraints: const BoxConstraints(maxWidth: 200, maxHeight: 120),
+                    child: Image.asset(
+                      'assets/photo.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (ctx, e, st) => loadLogo(),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 6),
+                  // App name
+                  const Text(
+                    "ASSISTANCE OROTECH",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF4EC9E1),
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 3,
+                    ),
+                  ),
+                  const SizedBox(height: 36),
                   // Main card
                   Container(
                     width: 420,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xFF162435),
                       borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFF2A4A6B), width: 1),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
+                          color: Colors.black.withOpacity(0.4),
                           blurRadius: 30,
                           offset: const Offset(0, 10),
                         ),
@@ -141,7 +146,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                                 width: 4,
                                 height: 20,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFB8962E),
+                                  color: const Color(0xFF4EC9E1),
                                   borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
@@ -151,7 +156,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF555555),
+                                  color: Color(0xFF8AB4C8),
                                   letterSpacing: 0.5,
                                 ),
                               ),
@@ -164,7 +169,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFFAAAAAA),
+                              color: Color(0xFF4EC9E1),
                               letterSpacing: 2,
                             ),
                           ),
@@ -172,53 +177,52 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           // ID value
                           Consumer<ServerModel>(
                             builder: (context, model, child) {
-                              return GestureDetector(
-                                onDoubleTap: () {
-                                  Clipboard.setData(ClipboardData(text: model.serverId.text));
-                                  showToast(translate("Copied"));
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFDF8EE),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: const Color(0xFFE8D8A0), width: 1.5),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: model.serverId,
-                                          readOnly: true,
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            isDense: true,
-                                            contentPadding: EdgeInsets.zero,
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF0D1B2A),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: const Color(0xFF2A5070), width: 1.5),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: model.serverId,
+                                        readOnly: true,
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.zero,
+                                        ),
+                                        style: const TextStyle(
+                                          fontSize: 36,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          letterSpacing: 4,
+                                        ),
+                                      ).workaroundFreezeLinuxMint(),
+                                    ),
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          Clipboard.setData(ClipboardData(text: model.serverId.text));
+                                          showToast(translate("Copied"));
+                                        },
+                                        borderRadius: BorderRadius.circular(8),
+                                        splashColor: const Color(0xFF4EC9E1).withOpacity(0.3),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF1E3D5C),
+                                            borderRadius: BorderRadius.circular(8),
                                           ),
-                                          style: const TextStyle(
-                                            fontSize: 36,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF222222),
-                                            letterSpacing: 4,
-                                          ),
-                                        ).workaroundFreezeLinuxMint(),
-                                      ),
-                                      Tooltip(
-                                        message: translate("Copy"),
-                                        child: InkWell(
-                                          onTap: () {
-                                            Clipboard.setData(ClipboardData(text: model.serverId.text));
-                                            showToast(translate("Copied"));
-                                          },
-                                          borderRadius: BorderRadius.circular(6),
-                                          child: const Padding(
-                                            padding: EdgeInsets.all(4),
-                                            child: Icon(Icons.copy, size: 18, color: Color(0xFFB8962E)),
-                                          ),
+                                          child: const Icon(Icons.copy_rounded, size: 18, color: Color(0xFF4EC9E1)),
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               );
                             },
@@ -230,7 +234,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFFAAAAAA),
+                              color: Color(0xFF4EC9E1),
                               letterSpacing: 2,
                             ),
                           ),
@@ -239,11 +243,11 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           Consumer<ServerModel>(
                             builder: (context, model, child) {
                               return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFDF8EE),
+                                  color: const Color(0xFF0D1B2A),
                                   borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: const Color(0xFFE8D8A0), width: 1.5),
+                                  border: Border.all(color: const Color(0xFF2A5070), width: 1.5),
                                 ),
                                 child: Row(
                                   children: [
@@ -259,22 +263,27 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                                         style: const TextStyle(
                                           fontSize: 28,
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFF444444),
+                                          color: Colors.white,
                                           letterSpacing: 3,
                                         ),
                                       ).workaroundFreezeLinuxMint(),
                                     ),
-                                    Tooltip(
-                                      message: translate("Copy"),
+                                    Material(
+                                      color: Colors.transparent,
                                       child: InkWell(
                                         onTap: () {
                                           Clipboard.setData(ClipboardData(text: model.serverPasswd.text));
                                           showToast(translate("Copied"));
                                         },
-                                        borderRadius: BorderRadius.circular(6),
-                                        child: const Padding(
-                                          padding: EdgeInsets.all(4),
-                                          child: Icon(Icons.copy, size: 18, color: Color(0xFFB8962E)),
+                                        borderRadius: BorderRadius.circular(8),
+                                        splashColor: const Color(0xFF4EC9E1).withOpacity(0.3),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF1E3D5C),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: const Icon(Icons.copy_rounded, size: 18, color: Color(0xFF4EC9E1)),
                                         ),
                                       ),
                                     ),
