@@ -120,7 +120,7 @@ jobs:
 
 
       - name: Patch serveur Orotech (IP + cle + nom)
-        run: python3 scripts/patch-orotech-config.sh
+        run: bash scripts/patch-orotech-config.sh
       - name: Restore bridge files
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -617,7 +617,7 @@ jobs:
 
 
       - name: Patch serveur Orotech (IP + cle + nom)
-        run: python3 scripts/patch-orotech-config.sh
+        run: bash scripts/patch-orotech-config.sh
       - name: Restore bridge files
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -782,7 +782,7 @@ jobs:
 
 
       - name: Patch serveur Orotech (IP + cle + nom)
-        run: python3 scripts/patch-orotech-config.sh
+        run: bash scripts/patch-orotech-config.sh
       - name: Restore bridge files
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -1066,7 +1066,7 @@ jobs:
 
 
       - name: Patch serveur Orotech (IP + cle + nom)
-        run: python3 scripts/patch-orotech-config.sh
+        run: bash scripts/patch-orotech-config.sh
       - name: Restore bridge files
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -1300,7 +1300,7 @@ jobs:
 
 
       - name: Patch serveur Orotech (IP + cle + nom)
-        run: python3 scripts/patch-orotech-config.sh
+        run: bash scripts/patch-orotech-config.sh
       - name: Restore bridge files
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -1463,7 +1463,7 @@ jobs:
 
 
       - name: Patch serveur Orotech (IP + cle + nom)
-        run: python3 scripts/patch-orotech-config.sh
+        run: bash scripts/patch-orotech-config.sh
       - name: Free Space
         run: |
           df -h
@@ -1489,7 +1489,7 @@ jobs:
 
 
       - name: Patch serveur Orotech (IP + cle + nom)
-        run: python3 scripts/patch-orotech-config.sh
+        run: bash scripts/patch-orotech-config.sh
       - name: Restore bridge files
         if: matrix.job.arch == 'x86_64' || env.UPLOAD_ARTIFACT == 'true'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -1527,7 +1527,7 @@ jobs:
 
 
       - name: Patch serveur Orotech (IP + cle + nom)
-        run: python3 scripts/patch-orotech-config.sh
+        run: bash scripts/patch-orotech-config.sh
       - name: Restore bridge files
         if: matrix.job.arch == 'x86_64' || env.UPLOAD_ARTIFACT == 'true'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -1796,7 +1796,7 @@ jobs:
 
 
       - name: Patch serveur Orotech (IP + cle + nom)
-        run: python3 scripts/patch-orotech-config.sh
+        run: bash scripts/patch-orotech-config.sh
       - name: Modify vcpkg.json for armv7
         if: matrix.job.vcpkg-triplet == 'arm-linux'
         run: |
@@ -1807,7 +1807,7 @@ jobs:
 
 
       - name: Patch serveur Orotech (IP + cle + nom)
-        run: python3 scripts/patch-orotech-config.sh
+        run: bash scripts/patch-orotech-config.sh
       - name: Free Space
         run: |
           df -h
@@ -2192,5 +2192,6 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           files: |
             flutter/build/rustdesk-${{ env.VERSION }}-${{ env.RELEASE_NAME }}.tar.gz
+
 
 
