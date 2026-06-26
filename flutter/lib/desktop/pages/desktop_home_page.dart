@@ -96,25 +96,27 @@ class _DesktopHomePageState extends State<DesktopHomePage>
             ),
           ),
           const SizedBox(width: 8),
-          Material(
-            color: const Color(0xFF1E3D5C),
-            borderRadius: BorderRadius.circular(8),
-            child: InkWell(
-              onTap: copyText.isEmpty
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E3D5C),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: IconButton(
+              onPressed: (value.isEmpty && copyText.isEmpty)
                   ? null
                   : () {
-                      Clipboard.setData(ClipboardData(text: copyText));
+                      final textToCopy = copyText.isNotEmpty ? copyText : value.replaceAll(' ', '');
+                      Clipboard.setData(ClipboardData(text: textToCopy));
                       showToast(translate("Copied"));
                     },
-              borderRadius: BorderRadius.circular(8),
-              splashColor: const Color(0xFF4EC9E1).withOpacity(0.3),
-              child: const Padding(
-                padding: EdgeInsets.all(10),
-                child: Icon(Icons.copy_rounded,
-                    size: 18, color: Color(0xFF4EC9E1)),
-              ),
+              icon: const Icon(Icons.copy_rounded,
+                  size: 18, color: Color(0xFF4EC9E1)),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+              splashRadius: 20,
             ),
           ),
+
         ],
       ),
     );
@@ -980,7 +982,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       final size = renderObject.size;
       if (size != imcomingOnlyHomeSize) {
         imcomingOnlyHomeSize = size;
-        windowManager.setSize(getIncomingOnlyHomeSize());
+        windowManager.setSize(getIncomingOnlyHomeSize()).then((_) {
+          windowManager.center();
+        });
       }
     }
   }
