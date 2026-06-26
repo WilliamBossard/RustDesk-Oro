@@ -473,9 +473,9 @@ class MyTheme {
   static ThemeData darkTheme = ThemeData(
     useMaterial3: false,
     brightness: Brightness.dark,
-    hoverColor: Color.fromARGB(255, 45, 46, 53),
-    scaffoldBackgroundColor: Color(0xFF18191E),
-    dialogBackgroundColor: Color(0xFF18191E),
+    hoverColor: Color.fromARGB(255, 26, 53, 80),
+    scaffoldBackgroundColor: Color(0xFF0D1B2A),  // OROTECH dark blue
+    dialogBackgroundColor: Color(0xFF162435),
     appBarTheme: AppBarTheme(
       shadowColor: Colors.transparent,
     ),
@@ -511,7 +511,7 @@ class MyTheme {
         color: accent80,
       ),
     ),
-    cardColor: Color(0xFF24252B),
+    cardColor: Color(0xFF162435),  // OROTECH card blue
     visualDensity: VisualDensity.adaptivePlatformDensity,
     tabBarTheme: const TabBarTheme(
       labelColor: Colors.white70,
