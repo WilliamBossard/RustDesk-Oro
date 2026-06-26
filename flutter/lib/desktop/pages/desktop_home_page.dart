@@ -65,8 +65,6 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildLeftPane(context),
-        if (!isIncomingOnly) const VerticalDivider(width: 1),
-        if (!isIncomingOnly) Expanded(child: buildRightPane(context)),
       ],
     ));
   }
@@ -77,94 +75,233 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   }
 
   Widget buildLeftPane(BuildContext context) {
-    final isIncomingOnly = bind.isIncomingOnly();
-    final isOutgoingOnly = bind.isOutgoingOnly();
-    final children = <Widget>[
-      if (!isOutgoingOnly) buildPresetPasswordWarning(),
-      if (bind.isCustomClient())
-        Align(
-          alignment: Alignment.center,
-          child: loadPowered(context),
-        ),
-      Align(
-        alignment: Alignment.center,
-        child: loadLogo(),
-      ),
-      buildTip(context),
-      if (!isOutgoingOnly) buildIDBoard(context),
-      if (!isOutgoingOnly) buildPasswordBoard(context),
-      const Offstage(),
-      buildPluginEntry(),
-    ];
-    if (isIncomingOnly) {
-      children.addAll([
-        Divider(),
-        OnlineStatusWidget(
-          onSvcStatusChanged: () {
-            if (isInHomePage()) {
-              Future.delayed(Duration(milliseconds: 300), () {
-                _updateWindowSize();
-              });
-            }
-          },
-        ).marginOnly(bottom: 6, right: 6)
-      ]);
-    }
-    final textColor = Theme.of(context).textTheme.titleLarge?.color;
+    final isIncomingOnly = true;
+    final isOutgoingOnly = false;
+
     return ChangeNotifierProvider.value(
       value: gFFI.serverModel,
       child: Container(
-        width: isIncomingOnly ? double.infinity : 200.0,
-        color: Theme.of(context).colorScheme.background,
-        child: Stack(
-          children: [
-            Center(
-              child: Container(
-                width: isIncomingOnly ? 400.0 : null,
-                child: Column(
-                  mainAxisAlignment: isIncomingOnly ? MainAxisAlignment.center : MainAxisAlignment.start,
-                  children: [
-                    if (isIncomingOnly) const Spacer(),
-                    SingleChildScrollView(
-                      controller: _leftPaneScrollController,
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFF8F4EC), Color(0xFFF0EAD6)],
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            controller: _leftPaneScrollController,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 40),
+              child: Column(
+                key: _childKey,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Logo
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 320, maxHeight: 80),
+                    child: loadLogo(),
+                  ),
+                  const SizedBox(height: 8),
+                  // App name
+                  const Text(
+                    "Assistance orotech",
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFFB8962E),
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  // Main card
+                  Container(
+                    width: 420,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 30,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
                       child: Column(
-                        key: _childKey,
-                        children: children,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Section header
+                          Row(
+                            children: [
+                              Container(
+                                width: 4,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFB8962E),
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                "Ce poste de travail",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF555555),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          // ID Label
+                          const Text(
+                            "IDENTIFIANT",
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFAAAAAA),
+                              letterSpacing: 2,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          // ID value
+                          Consumer<ServerModel>(
+                            builder: (context, model, child) {
+                              return GestureDetector(
+                                onDoubleTap: () {
+                                  Clipboard.setData(ClipboardData(text: model.serverId.text));
+                                  showToast(translate("Copied"));
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFDF8EE),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: const Color(0xFFE8D8A0), width: 1.5),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: model.serverId,
+                                          readOnly: true,
+                                          decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                            isDense: true,
+                                            contentPadding: EdgeInsets.zero,
+                                          ),
+                                          style: const TextStyle(
+                                            fontSize: 36,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF222222),
+                                            letterSpacing: 4,
+                                          ),
+                                        ).workaroundFreezeLinuxMint(),
+                                      ),
+                                      Tooltip(
+                                        message: translate("Copy"),
+                                        child: InkWell(
+                                          onTap: () {
+                                            Clipboard.setData(ClipboardData(text: model.serverId.text));
+                                            showToast(translate("Copied"));
+                                          },
+                                          borderRadius: BorderRadius.circular(6),
+                                          child: const Padding(
+                                            padding: EdgeInsets.all(4),
+                                            child: Icon(Icons.copy, size: 18, color: Color(0xFFB8962E)),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                          // Password label
+                          const Text(
+                            "MOT DE PASSE",
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFAAAAAA),
+                              letterSpacing: 2,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          // Password value
+                          Consumer<ServerModel>(
+                            builder: (context, model, child) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFDF8EE),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: const Color(0xFFE8D8A0), width: 1.5),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: model.serverPasswd,
+                                        readOnly: true,
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.zero,
+                                        ),
+                                        style: const TextStyle(
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF444444),
+                                          letterSpacing: 3,
+                                        ),
+                                      ).workaroundFreezeLinuxMint(),
+                                    ),
+                                    Tooltip(
+                                      message: translate("Copy"),
+                                      child: InkWell(
+                                        onTap: () {
+                                          Clipboard.setData(ClipboardData(text: model.serverPasswd.text));
+                                          showToast(translate("Copied"));
+                                        },
+                                        borderRadius: BorderRadius.circular(6),
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(4),
+                                          child: Icon(Icons.copy, size: 18, color: Color(0xFFB8962E)),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 28),
+                          // Online status
+                          OnlineStatusWidget(
+                            onSvcStatusChanged: () {
+                              if (isInHomePage()) {
+                                Future.delayed(const Duration(milliseconds: 300), () {
+                                  _updateWindowSize();
+                                });
+                              }
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                    Expanded(child: Container())
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            if (isOutgoingOnly)
-              Positioned(
-                bottom: 6,
-                left: 12,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: InkWell(
-                    child: Obx(
-                      () => Icon(
-                        Icons.settings,
-                        color: _editHover.value
-                            ? textColor
-                            : Colors.grey.withOpacity(0.5),
-                        size: 22,
-                      ),
-                    ),
-                    onTap: () => {
-                      if (DesktopSettingPage.tabKeys.isNotEmpty)
-                        {
-                          DesktopSettingPage.switch2page(
-                              DesktopSettingPage.tabKeys[0])
-                        }
-                    },
-                    onHover: (value) => _editHover.value = value,
-                  ),
-                ),
-              )
-          ],
+          ),
         ),
       ),
     );
