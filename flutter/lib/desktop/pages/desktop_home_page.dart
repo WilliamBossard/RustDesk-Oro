@@ -93,24 +93,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       buildTip(context),
       if (!isOutgoingOnly) buildIDBoard(context),
       if (!isOutgoingOnly) buildPasswordBoard(context),
-      FutureBuilder<Widget>(
-        future: Future.value(
-            Obx(() => buildHelpCards(stateGlobal.updateUrl.value))),
-        builder: (_, data) {
-          if (data.hasData) {
-            if (isIncomingOnly) {
-              if (isInHomePage()) {
-                Future.delayed(Duration(milliseconds: 300), () {
-                  _updateWindowSize();
-                });
-              }
-            }
-            return data.data!;
-          } else {
-            return const Offstage();
-          }
-        },
-      ),
+      const Offstage(),
       buildPluginEntry(),
     ];
     if (isIncomingOnly) {
@@ -131,21 +114,28 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     return ChangeNotifierProvider.value(
       value: gFFI.serverModel,
       child: Container(
-        width: isIncomingOnly ? 280.0 : 200.0,
+        width: isIncomingOnly ? double.infinity : 200.0,
         color: Theme.of(context).colorScheme.background,
         child: Stack(
           children: [
-            Column(
-              children: [
-                SingleChildScrollView(
-                  controller: _leftPaneScrollController,
-                  child: Column(
-                    key: _childKey,
-                    children: children,
-                  ),
+            Center(
+              child: Container(
+                width: isIncomingOnly ? 400.0 : null,
+                child: Column(
+                  mainAxisAlignment: isIncomingOnly ? MainAxisAlignment.center : MainAxisAlignment.start,
+                  children: [
+                    if (isIncomingOnly) const Spacer(),
+                    SingleChildScrollView(
+                      controller: _leftPaneScrollController,
+                      child: Column(
+                        key: _childKey,
+                        children: children,
+                      ),
+                    ),
+                    Expanded(child: Container())
+                  ],
                 ),
-                Expanded(child: Container())
-              ],
+              ),
             ),
             if (isOutgoingOnly)
               Positioned(
@@ -191,7 +181,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     final model = gFFI.serverModel;
     return Container(
       margin: const EdgeInsets.only(left: 20, right: 11),
-      height: 57,
+      height: 90,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
@@ -215,7 +205,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                         Text(
                           translate("ID"),
                           style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 18,
                               color: Theme.of(context)
                                   .textTheme
                                   .titleLarge
@@ -241,7 +231,8 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           contentPadding: EdgeInsets.only(top: 10, bottom: 10),
                         ),
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 42,
+                          fontWeight: FontWeight.bold,
                         ),
                       ).workaroundFreezeLinuxMint(),
                     ),
@@ -304,7 +295,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         children: [
           Container(
             width: 2,
-            height: 52,
+            height: 70,
             decoration: BoxDecoration(color: MyTheme.accent),
           ),
           Expanded(
@@ -316,7 +307,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                   AutoSizeText(
                     translate("One-time Password"),
                     style: TextStyle(
-                        fontSize: 14, color: textColor?.withOpacity(0.5)),
+                        fontSize: 18, color: textColor?.withOpacity(0.5)),
                     maxLines: 1,
                   ),
                   Row(
@@ -338,7 +329,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                               contentPadding:
                                   EdgeInsets.only(top: 14, bottom: 10),
                             ),
-                            style: TextStyle(fontSize: 15),
+                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                           ).workaroundFreezeLinuxMint(),
                         ),
                       ),
