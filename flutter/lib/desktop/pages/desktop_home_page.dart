@@ -159,10 +159,10 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                   const Text(
                     "ASSISTANCE ORO",
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 26,
                       color: Color(0xFF4EC9E1),
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 3,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 5,
                     ),
                   ),
                   const SizedBox(height: 36),
