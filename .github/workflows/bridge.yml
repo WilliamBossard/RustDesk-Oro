@@ -100,6 +100,8 @@ jobs:
 
       - name: Run flutter rust bridge
         run: |
+          # Pre-run cargo metadata to download git updates and prevent stderr pollution which crashes flutter_rust_bridge_codegen
+          cargo metadata --format-version 1 > /dev/null
           ~/.cargo/bin/flutter_rust_bridge_codegen --rust-input ./src/flutter_ffi.rs --dart-output ./flutter/lib/generated_bridge.dart --c-output ./flutter/macos/Runner/bridge_generated.h
           cp ./flutter/macos/Runner/bridge_generated.h ./flutter/ios/Runner/bridge_generated.h
 
