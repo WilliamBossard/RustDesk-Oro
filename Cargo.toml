@@ -216,7 +216,7 @@ libxdo-sys = { path = "libs/libxdo-sys-stub" }
 LegalCopyright = "Copyright © 2026 Orotech. All rights reserved."
 ProductName = "Assistance Oro"
 FileDescription = "Assistance Oro Remote Desktop"
-OriginalFilename = "rustdesk.exe"
+OriginalFilename = "Assistance Oro.exe"
 
 [target.'cfg(target_os="windows")'.build-dependencies]
 winres = "0.1"
