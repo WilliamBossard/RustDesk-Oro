@@ -102,6 +102,8 @@ class _DesktopHomePageState extends State<DesktopHomePage>
             decoration: const InputDecoration(
               border: InputBorder.none,
               isDense: true,
+              filled: true,
+              fillColor: Colors.transparent,
             ),
             style: style,
             mouseCursor: SystemMouseCursors.click,
