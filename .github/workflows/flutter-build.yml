@@ -316,14 +316,14 @@ jobs:
         if: ${{ inputs.upload-artifact }}
         with:
           name: ${{ matrix.job.arch == 'aarch64' && 'topmostwindow-artifacts-ARM64' || 'topmostwindow-artifacts-x64' }}
-          path: "./rustdesk"
+          path: "./Assistance-Oro"
 
       - name: Upload unsigned
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: rustdesk-unsigned-windows-${{ matrix.job.arch }}
-          path: rustdesk
+          name: Assistance-Oro-unsigned-windows-${{ matrix.job.arch }}
+          path: Assistance-Oro
 
       - name: Sign rustdesk files
         if: env.UPLOAD_ARTIFACT == 'true' && env.SIGN_BASE_URL != '-2'
@@ -368,11 +368,17 @@ jobs:
         run: |
           BASE_URL=${{ env.SIGN_BASE_URL }} SECRET_KEY=${{ secrets.SIGN_SECRET_KEY }} python3 res/job.py sign_files ./SignOutput
 
-      - name: Rename files to Assistance Oro
+      - name: Rename artifacts
         shell: bash
         run: |
-          mv ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.exe "./SignOutput/Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.exe" || true
-          mv ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.msi "./SignOutput/Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.msi" || true
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
 
       - name: Publish Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
@@ -381,15 +387,27 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            ./SignOutput/Assistance Oro-*.msi
-            ./SignOutput/Assistance Oro-*.exe
+            ./SignOutput/Assistance-Oro-*.msi
+            ./SignOutput/Assistance-Oro-*.exe
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
 
       - name: Upload portable exe to Artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: env.UPLOAD_ARTIFACT == 'true'
         with:
           name: Assistance-Orotech-Windows-${{ matrix.job.arch }}-exe
-          path: "./SignOutput/Assistance Oro-*.exe"
+          path: ./SignOutput/Assistance-Oro-*.exe
 
   # The fallback for the flutter version, we use Sciter for 32bit Windows.
   build-for-windows-sciter:
@@ -507,7 +525,7 @@ jobs:
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: rustdesk-unsigned-windows-${{ matrix.job.arch }}
+          name: Assistance-Oro-unsigned-windows-${{ matrix.job.arch }}
           path: Release
 
       - name: Sign rustdesk files
@@ -534,6 +552,18 @@ jobs:
         run: |
           BASE_URL=${{ env.SIGN_BASE_URL }} SECRET_KEY=${{ secrets.SIGN_SECRET_KEY }} python3 res/job.py sign_files ./SignOutput/
 
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
+
       - name: Publish Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         if: env.UPLOAD_ARTIFACT == 'true'
@@ -541,11 +571,11 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            ./SignOutput/rustdesk-*.exe
+            ./SignOutput/Assistance-Oro-*.exe
 
   build-rustdesk-ios:
     if: ${{ inputs.upload-artifact }}
-    name: build rustdesk ios ipa
+    name: build Assistance-Oro ios ipa
     runs-on: ${{ matrix.job.os }}
     needs: [generate-bridge]
     strategy:
@@ -638,8 +668,8 @@ jobs:
       - name: Upload liblibrustdesk.a Artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: liblibrustdesk.a
-          path: target/aarch64-apple-ios/release/liblibrustdesk.a
+          name: liblibAssistance-Oro.a
+          path: target/aarch64-apple-ios/release/liblibAssistance-Oro.a
 
       - name: Build rustdesk
         shell: bash
@@ -844,14 +874,26 @@ jobs:
           CREATE_DMG="$(command -v create-dmg)"
           CREATE_DMG="$(readlink -f "$CREATE_DMG")"
           sed -i -e 's/MAXIMUM_UNMOUNTING_ATTEMPTS=3/MAXIMUM_UNMOUNTING_ATTEMPTS=7/' "$CREATE_DMG"
-          create-dmg --icon "RustDesk.app" 200 190 --hide-extension "RustDesk.app" --window-size 800 400 --app-drop-link 600 185 "Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.dmg" "./flutter/build/macos/Build/Products/Release/RustDesk.app"
+          create-dmg --icon "RustDesk.app" 200 190 --hide-extension "RustDesk.app" --window-size 800 400 --app-drop-link 600 185 "Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.dmg" ./flutter/build/macos/Build/Products/Release/RustDesk.app
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
 
       - name: Upload unsigned macOS app
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: rustdesk-unsigned-macos-${{ matrix.job.arch }}
-          path: Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.dmg # can not upload the directory directly or tar.gz, which destroy the link structure, causing the codesign failed
+          name: Assistance-Oro-unsigned-macos-${{ matrix.job.arch }}
+          path: Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.dmg # can not upload the directory directly or tar.gz, which destroy the link structure, causing the codesign failed
 
       - name: Codesign app and create signed dmg
         if: env.MACOS_P12_BASE64 != null && env.UPLOAD_ARTIFACT == 'true'
@@ -865,17 +907,29 @@ jobs:
           security unlock-keychain -p ${{ secrets.MACOS_P12_PASSWORD }} rustdesk.keychain
           # start sign the rustdesk.app and dmg
           rm -rf *.dmg || true
-          codesign --force --options runtime -s ${{ secrets.MACOS_CODESIGN_IDENTITY }} --deep --strict "./flutter/build/macos/Build/Products/Release/RustDesk.app" -vvv
-          create-dmg --icon "RustDesk.app" 200 190 --hide-extension "RustDesk.app" --window-size 800 400 --app-drop-link 600 185 "Assistance Oro-${{ env.VERSION }}.dmg" "./flutter/build/macos/Build/Products/Release/RustDesk.app"
-          codesign --force --options runtime -s ${{ secrets.MACOS_CODESIGN_IDENTITY }} --deep --strict "Assistance Oro-${{ env.VERSION }}.dmg" -vvv
-          # notarize the Assistance Oro-${{ env.VERSION }}.dmg
-          rcodesign notary-submit --api-key-path ${{ github.workspace }}/rustdesk.json  --staple "Assistance Oro-${{ env.VERSION }}.dmg"
+          codesign --force --options runtime -s ${{ secrets.MACOS_CODESIGN_IDENTITY }} --deep --strict ./flutter/build/macos/Build/Products/Release/RustDesk.app -vvv
+          create-dmg --icon "RustDesk.app" 200 190 --hide-extension "RustDesk.app" --window-size 800 400 --app-drop-link 600 185 Assistance-Oro-${{ env.VERSION }}.dmg ./flutter/build/macos/Build/Products/Release/RustDesk.app
+          codesign --force --options runtime -s ${{ secrets.MACOS_CODESIGN_IDENTITY }} --deep --strict Assistance-Oro-${{ env.VERSION }}.dmg -vvv
+          # notarize the Assistance-Oro-${{ env.VERSION }}.dmg
+          rcodesign notary-submit --api-key-path ${{ github.workspace }}/rustdesk.json  --staple Assistance-Oro-${{ env.VERSION }}.dmg
 
       - name: Rename rustdesk
         if: env.UPLOAD_ARTIFACT == 'true'
         run: |
-          for name in Assistance\ Oro*??.dmg; do
+          for name in Assistance-Oro*??.dmg; do
               mv "$name" "${name%%.dmg}-${{ matrix.job.arch }}.dmg" || true
+          done
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
           done
 
       - name: Publish DMG package
@@ -885,7 +939,7 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            Assistance Oro*-${{ matrix.job.arch }}.dmg
+            Assistance-Oro*-${{ matrix.job.arch }}.dmg
 
   publish_unsigned:
     needs:
@@ -898,43 +952,53 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: rustdesk-unsigned-macos-x86_64
+          name: Assistance-Oro-unsigned-macos-x86_64
           path: ./
 
       - name: Download Artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: rustdesk-unsigned-macos-aarch64
+          name: Assistance-Oro-unsigned-macos-aarch64
           path: ./
 
       - name: Download Artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: rustdesk-unsigned-windows-x86_64
+          name: Assistance-Oro-unsigned-windows-x86_64
           path: ./windows-x86_64/
 
       - name: Download Artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: rustdesk-unsigned-windows-x86
+          name: Assistance-Oro-unsigned-windows-x86
           path: ./windows-x86/
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
 
       - name: Combine unsigned app
         run: |
-          mv windows-x86_64/rustdesk.exe "windows-x86_64/Assistance Oro-${{ env.VERSION }}-x86_64.exe" || true
-          mv windows-x86/rustdesk.exe "windows-x86/Assistance Oro-${{ env.VERSION }}-x86.exe" || true
-          tar czf "Assistance Oro-${{ env.VERSION }}-unsigned.tar.gz" *.dmg windows-x86_64 windows-x86
+          tar czf "Assistance-Oro-${{ env.VERSION }}-unsigned.tar.gz" *.dmg windows-x86_64 windows-x86
 
       - name: Publish unsigned app
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
-          files: Assistance Oro-${{ env.VERSION }}-unsigned.tar.gz
+          files: Assistance-Oro-${{ env.VERSION }}-unsigned.tar.gz
 
   build-rustdesk-android:
     needs: [generate-bridge]
-    name: build rustdesk android apk ${{ matrix.job.target }}
+    name: build Assistance-Oro android apk ${{ matrix.job.target }}
     runs-on: ${{ matrix.job.os }}
     strategy:
       fail-fast: false
@@ -1125,8 +1189,8 @@ jobs:
       - name: Upload Rustdesk library to Artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: librustdesk.so.${{ matrix.job.target }}
-          path: ./target/${{ matrix.job.target }}/release/liblibrustdesk.so
+          name: libAssistance-Oro.so.${{ matrix.job.target }}
+          path: ./target/${{ matrix.job.target }}/release/liblibAssistance-Oro.so
 
       - name: Build rustdesk
         shell: bash
@@ -1206,8 +1270,20 @@ jobs:
         if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
-          path: ${{steps.sign-rustdesk.outputs.signedReleaseFile}}
+          name: Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
+          path: ${{steps.sign-Assistance-Oro.outputs.signedReleaseFile}}
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
 
       - name: Publish signed apk package
         if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'
@@ -1216,7 +1292,19 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            ${{steps.sign-rustdesk.outputs.signedReleaseFile}}
+            ${{steps.sign-Assistance-Oro.outputs.signedReleaseFile}}
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
 
       - name: Publish unsigned apk package
         if: env.ANDROID_SIGNING_KEY == null && env.UPLOAD_ARTIFACT == 'true'
@@ -1225,11 +1313,11 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            signed-apk/rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
+            signed-apk/Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
 
   build-rustdesk-android-universal:
     needs: [build-rustdesk-android]
-    name: build rustdesk android universal apk
+    name: build Assistance-Oro android universal apk
     if: ${{ inputs.upload-artifact }}
     runs-on: ubuntu-24.04
     env:
@@ -1318,26 +1406,26 @@ jobs:
       - name: Download Rustdesk library from Artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: librustdesk.so.aarch64-linux-android
+          name: libAssistance-Oro.so.aarch64-linux-android
           path: ./flutter/android/app/src/main/jniLibs/arm64-v8a
 
       - name: Download Rustdesk library from Artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: librustdesk.so.armv7-linux-androideabi
+          name: libAssistance-Oro.so.armv7-linux-androideabi
           path: ./flutter/android/app/src/main/jniLibs/armeabi-v7a
 
       - name: Download Rustdesk library from Artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: librustdesk.so.x86_64-linux-android
+          name: libAssistance-Oro.so.x86_64-linux-android
           path: ./flutter/android/app/src/main/jniLibs/x86_64
 
       - name: Download Rustdesk library from Artifacts
         if: ${{ env.reltype == 'debug' }}
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: librustdesk.so.i686-linux-android
+          name: libAssistance-Oro.so.i686-linux-android
           path: ./flutter/android/app/src/main/jniLibs/x86
 
       - name: Build rustdesk
@@ -1393,8 +1481,20 @@ jobs:
         if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
-          path: ${{steps.sign-rustdesk.outputs.signedReleaseFile}}
+          name: Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
+          path: ${{steps.sign-Assistance-Oro.outputs.signedReleaseFile}}
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
 
       - name: Publish signed apk package
         if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'
@@ -1403,7 +1503,19 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            ${{steps.sign-rustdesk.outputs.signedReleaseFile}}
+            ${{steps.sign-Assistance-Oro.outputs.signedReleaseFile}}
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
 
       - name: Publish unsigned apk package
         if: env.ANDROID_SIGNING_KEY == null && env.UPLOAD_ARTIFACT == 'true'
@@ -1412,11 +1524,11 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            signed-apk/rustdesk-${{ env.VERSION }}-universal${{ env.suffix }}.apk
+            signed-apk/Assistance-Oro-${{ env.VERSION }}-universal${{ env.suffix }}.apk
 
   build-rustdesk-linux:
     needs: [generate-bridge]
-    name: build rustdesk linux ${{ matrix.job.target }}
+    name: build Assistance-Oro linux ${{ matrix.job.target }}
     runs-on: ${{ matrix.job.on }}
     strategy:
       fail-fast: false
@@ -1544,7 +1656,7 @@ jobs:
           path: ./
 
       - uses: rustdesk-org/run-on-arch-action@d3fcfbb632b84cf7f6bc772bfaaa2c2f4f8789a8 # no release tag; commit 2026-05-26
-        name: Build rustdesk
+        name: Build Assistance-Oro
         id: vcpkg
         if: matrix.job.arch == 'x86_64' || env.UPLOAD_ARTIFACT == 'true'
         with:
@@ -1715,6 +1827,18 @@ jobs:
                 mv "$name" /workspace/"${name%%.rpm}-suse.rpm"
             done
 
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
+
       - name: Publish debian/rpm package
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
@@ -1722,15 +1846,27 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            Assistance Oro-*.deb
-            Assistance Oro-*.rpm
+            Assistance-Oro-*.deb
+            Assistance-Oro-*.rpm
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
 
       - name: Upload deb
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: env.UPLOAD_ARTIFACT == 'true'
         with:
-          name: Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.deb
-          path: Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.deb
+          name: Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.deb
+          path: Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.deb
 
       # only x86_64 for arch since we can not find newest arm64 docker image to build
       # old arch image does not make sense for arch since it is "arch" which always update to date
@@ -1751,6 +1887,18 @@ jobs:
           scripts: |
             cd res && HBB=`pwd`/.. FLUTTER=1 makepkg -f
 
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
+
       - name: Publish archlinux package
         if: matrix.job.arch == 'x86_64' && env.UPLOAD_ARTIFACT == 'true'
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
@@ -1758,12 +1906,12 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            res/rustdesk-${{ env.VERSION }}*.zst
+            res/Assistance-Oro-${{ env.VERSION }}*.zst
 
   build-rustdesk-linux-sciter:
     if: ${{ inputs.upload-artifact }}
     runs-on: ${{ matrix.job.on }}
-    name: build-rustdesk-linux-sciter ${{ matrix.job.target }}
+    name: build-Assistance-Oro-linux-sciter ${{ matrix.job.target }}
     strategy:
       fail-fast: false
       matrix:
@@ -1834,7 +1982,7 @@ jobs:
           echo "RUST_TOOLCHAIN_VERSION=$RUST_TOOLCHAIN_VERSION" >> $GITHUB_ENV
 
       - uses: rustdesk-org/run-on-arch-action@d3fcfbb632b84cf7f6bc772bfaaa2c2f4f8789a8 # no release tag; commit 2026-05-26
-        name: Build rustdesk sciter binary for ${{ matrix.job.arch }}
+        name: Build Assistance-Oro sciter binary for ${{ matrix.job.arch }}
         id: vcpkg
         with:
           arch: ${{ matrix.job.arch }}
@@ -1977,6 +2125,18 @@ jobs:
               cp "$name" "${name%%.deb}-${{ matrix.job.arch }}-sciter.deb"
           done
 
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
+
       - name: Publish debian package
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
@@ -1984,14 +2144,26 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
+            Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
 
       - name: Upload deb
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: env.UPLOAD_ARTIFACT == 'true'
         with:
-          name: Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
-          path: Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
+          name: Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
+          path: Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}-sciter.deb
 
   build-appimage:
     name: Build appimage ${{ matrix.job.target }}
@@ -2013,12 +2185,12 @@ jobs:
       - name: Download Binary
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.deb
+          name: Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.deb
           path: .
 
       - name: Rename Binary
         run: |
-          mv "Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}.deb" appimage/rustdesk.deb
+          mv rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.deb appimage/rustdesk.deb
 
       - name: Build appimage package
         shell: bash
@@ -2039,6 +2211,18 @@ jobs:
             echo "appimage-builder not available, skipping AppImage build"
           fi
 
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
+
       - name: Publish appimage package
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
@@ -2046,7 +2230,7 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            ./appimage/rustdesk-${{ env.VERSION }}-*.AppImage
+            ./appimage/Assistance-Oro-${{ env.VERSION }}-*.AppImage
 
   build-flatpak:
     name: Build flatpak ${{ matrix.job.target }}${{ matrix.job.suffix }}
@@ -2091,15 +2275,15 @@ jobs:
       - name: Download Binary
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.deb
+          name: Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.deb
           path: .
 
       - name: Rename Binary
         run: |
-          mv rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.deb flatpak/rustdesk.deb
+          mv Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.deb flatpak/rustdesk.deb
 
       - uses: rustdesk-org/run-on-arch-action@d3fcfbb632b84cf7f6bc772bfaaa2c2f4f8789a8 # no release tag; commit 2026-05-26
-        name: Build rustdesk flatpak package for ${{ matrix.job.arch }}
+        name: Build Assistance-Oro flatpak package for ${{ matrix.job.arch }}
         id: flatpak
         with:
           arch: ${{ matrix.job.arch }}
@@ -2123,7 +2307,19 @@ jobs:
             pushd flatpak
             git clone https://github.com/flathub/shared-modules.git --depth=1
             flatpak-builder --user --install-deps-from=flathub -y --force-clean --repo=repo ./build ./rustdesk.json
-            flatpak build-bundle ./repo "Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.flatpak" com.rustdesk.RustDesk
+            flatpak build-bundle ./repo rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.flatpak com.rustdesk.RustDesk
+
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
 
       - name: Publish flatpak package
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
@@ -2131,11 +2327,11 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            flatpak/Assistance Oro-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.flatpak
+            flatpak/Assistance-Oro-${{ env.VERSION }}-${{ matrix.job.arch }}${{ matrix.job.suffix }}.flatpak
 
   build-rustdesk-web:
     if: False
-    name: build-rustdesk-web
+    name: build-Assistance-Oro-web
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -2197,6 +2393,18 @@ jobs:
           sha256sum "${dir_name}".tar.gz
           popd
 
+      - name: Rename artifacts
+        shell: bash
+        run: |
+          find . -maxdepth 5 -name "rustdesk*" | while read f; do
+            dir=$(dirname "$f")
+            base=$(basename "$f")
+            if [[ "$base" == rustdesk* && "$base" != "rustdesk.json" ]]; then
+              newbase="${base/rustdesk/Assistance-Oro}"
+              mv "$f" "$dir/$newbase" || true
+            fi
+          done
+
       - name: Publish web
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
@@ -2204,7 +2412,7 @@ jobs:
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            flutter/build/rustdesk-${{ env.VERSION }}-${{ env.RELEASE_NAME }}.tar.gz
+            flutter/build/Assistance-Oro-${{ env.VERSION }}-${{ env.RELEASE_NAME }}.tar.gz
 
 
 
