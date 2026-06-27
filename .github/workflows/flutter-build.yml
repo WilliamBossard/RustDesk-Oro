@@ -368,6 +368,11 @@ jobs:
         run: |
           BASE_URL=${{ env.SIGN_BASE_URL }} SECRET_KEY=${{ secrets.SIGN_SECRET_KEY }} python3 res/job.py sign_files ./SignOutput
 
+      - name: Rename executable to Assistance Oro
+        shell: bash
+        run: |
+          mv ./SignOutput/rustdesk-*.exe "./SignOutput/Assistance Oro.exe" || true
+
       - name: Publish Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         if: env.UPLOAD_ARTIFACT == 'true'
@@ -376,14 +381,14 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           files: |
             ./SignOutput/rustdesk-*.msi
-            ./SignOutput/rustdesk-*.exe
+            ./SignOutput/Assistance Oro.exe
 
       - name: Upload portable exe to Artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: env.UPLOAD_ARTIFACT == 'true'
         with:
           name: Assistance-Orotech-Windows-${{ matrix.job.arch }}-exe
-          path: ./SignOutput/rustdesk-*.exe
+          path: "./SignOutput/Assistance Oro.exe"
 
   # The fallback for the flutter version, we use Sciter for 32bit Windows.
   build-for-windows-sciter:
@@ -915,6 +920,8 @@ jobs:
 
       - name: Combine unsigned app
         run: |
+          mv windows-x86_64/rustdesk.exe "windows-x86_64/Assistance Oro.exe" || true
+          mv windows-x86/rustdesk.exe "windows-x86/Assistance Oro.exe" || true
           tar czf rustdesk-${{ env.VERSION }}-unsigned.tar.gz *.dmg windows-x86_64 windows-x86
 
       - name: Publish unsigned app
