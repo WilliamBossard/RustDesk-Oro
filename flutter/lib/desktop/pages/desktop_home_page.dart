@@ -76,52 +76,37 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   }
 
   Widget _buildOroCopyField({
-    required String value,
-    required String copyText,
+    required TextEditingController controller,
     required TextStyle style,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
         color: const Color(0xFF0D1B2A),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: const Color(0xFF2A5070), width: 1.5),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: SelectableText(
-              value,
-              style: style,
+      child: Tooltip(
+        message: translate("Double tap to copy"),
+        waitDuration: const Duration(milliseconds: 500),
+        child: GestureDetector(
+          onDoubleTap: () {
+            if (controller.text.isNotEmpty) {
+              Clipboard.setData(ClipboardData(text: controller.text.replaceAll(' ', '')));
+              showToast(translate("Copied"));
+            }
+          },
+          child: TextFormField(
+            controller: controller,
+            readOnly: true,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              isDense: true,
             ),
+            style: style,
+            mouseCursor: SystemMouseCursors.click,
           ),
-          const SizedBox(width: 8),
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                final textToCopy = copyText.isNotEmpty ? copyText : value.replaceAll(' ', '');
-                if (textToCopy.isNotEmpty) {
-                  Clipboard.setData(ClipboardData(text: textToCopy));
-                  showToast(translate("Copied"));
-                }
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E3D5C),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Center(
-                  child: Icon(Icons.copy_rounded, size: 18, color: Color(0xFF4EC9E1)),
-                ),
-              ),
-            ),
-          ),
-
-        ],
+        ),
       ),
     );
   }
@@ -232,20 +217,14 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                             builder: (context, model, child) {
                               final idController =
                                   model.serverId as IDTextEditingController;
-                              return ValueListenableBuilder<TextEditingValue>(
-                                valueListenable: idController,
-                                builder: (context, val, child) {
-                                  return _buildOroCopyField(
-                                    value: idController.text,
-                                    copyText: idController.id,
-                                    style: const TextStyle(
-                                      fontSize: 36,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      letterSpacing: 4,
-                                    ),
-                                  );
-                                },
+                              return _buildOroCopyField(
+                                controller: idController,
+                                style: const TextStyle(
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 4,
+                                ),
                               );
                             },
                           ),
@@ -264,20 +243,14 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           // Password value
                           Consumer<ServerModel>(
                             builder: (context, model, child) {
-                              return ValueListenableBuilder<TextEditingValue>(
-                                valueListenable: model.serverPasswd,
-                                builder: (context, val, child) {
-                                  return _buildOroCopyField(
-                                    value: model.serverPasswd.text,
-                                    copyText: model.serverPasswd.text,
-                                    style: const TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                      letterSpacing: 3,
-                                    ),
-                                  );
-                                },
+                              return _buildOroCopyField(
+                                controller: model.serverPasswd,
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: 3,
+                                ),
                               );
                             },
                           ),
