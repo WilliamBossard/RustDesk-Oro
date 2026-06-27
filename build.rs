@@ -27,6 +27,8 @@ fn build_manifest() {
     use std::io::Write;
     if std::env::var("PROFILE").unwrap() == "release" {
         let mut res = winres::WindowsResource::new();
+        res.set("FileDescription", "Assistance Oro");
+        res.set("ProductName", "Assistance Oro");
         res.set_icon("res/icon.ico")
             .set_language(winapi::um::winnt::MAKELANGID(
                 winapi::um::winnt::LANG_ENGLISH,
